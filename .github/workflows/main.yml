@@ -26,27 +26,33 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Fix web dependencies
+      - name: Setup Gradle 9.5
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.5'
+
+      - name: Install web dependencies
         working-directory: app/TeleChat-CloudBuild/TeleChat-Android/web
         run: |
           npm install
 
-      - name: Fix Gradle version
+      - name: Prepare Android build
         working-directory: app/TeleChat-CloudBuild/TeleChat-Android
         run: |
-          echo "=== Current Gradle configuration ==="
-          cat android/gradle/wrapper/gradle-wrapper.properties
+          chmod +x build-android.sh
 
-          echo "=== Switching Gradle to 9.5 ==="
-          sed -i -E 's#gradle-[0-9.]+-(bin|all)\.zip#gradle-9.5-\1.zip#' android/gradle/wrapper/gradle-wrapper.properties
+          echo "=== Build script before patch ==="
+          cat build-android.sh
 
-          echo "=== New Gradle configuration ==="
-          cat android/gradle/wrapper/gradle-wrapper.properties
+          sed -i 's#\./gradlew#gradle#g' build-android.sh
+          sed -i 's#gradlew#gradle#g' build-android.sh
+
+          echo "=== Build script after patch ==="
+          cat build-android.sh
 
       - name: Build Android
         working-directory: app/TeleChat-CloudBuild/TeleChat-Android
         run: |
-          chmod +x build-android.sh
           ./build-android.sh
 
       - name: Find APK
