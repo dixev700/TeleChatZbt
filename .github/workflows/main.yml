@@ -38,6 +38,11 @@ jobs:
           echo "=== WEB ==="
           ls -lah web
 
+            - name: Fix web dependencies
+         working-directory: app/TeleChat-CloudBuild/TeleChat-Android/web
+        run: |
+          npm install
+
       - name: Build Android
         working-directory: app/TeleChat-CloudBuild/TeleChat-Android
         run: |
