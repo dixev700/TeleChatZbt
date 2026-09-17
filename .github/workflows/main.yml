@@ -26,22 +26,22 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Show Android project
-        working-directory: app/TeleChat-CloudBuild/TeleChat-Android
-        run: |
-          echo "=== PROJECT ==="
-          ls -lah
-
-          echo "=== BUILD SCRIPT ==="
-          sed -n '1,240p' build-android.sh
-
-          echo "=== WEB ==="
-          ls -lah web
-
       - name: Fix web dependencies
         working-directory: app/TeleChat-CloudBuild/TeleChat-Android/web
         run: |
           npm install
+
+      - name: Fix Gradle version
+        working-directory: app/TeleChat-CloudBuild/TeleChat-Android
+        run: |
+          echo "=== Current Gradle configuration ==="
+          cat android/gradle/wrapper/gradle-wrapper.properties
+
+          echo "=== Switching Gradle to 9.5 ==="
+          sed -i -E 's#gradle-[0-9.]+-(bin|all)\.zip#gradle-9.5-\1.zip#' android/gradle/wrapper/gradle-wrapper.properties
+
+          echo "=== New Gradle configuration ==="
+          cat android/gradle/wrapper/gradle-wrapper.properties
 
       - name: Build Android
         working-directory: app/TeleChat-CloudBuild/TeleChat-Android
