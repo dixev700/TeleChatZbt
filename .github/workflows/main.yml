@@ -13,23 +13,35 @@ jobs:
 
       - name: Extract TeleChat
         run: |
-          rm -rf app
-          mkdir app
-          unzip -q huesos.zip-d app
-
-          echo "=== ROOT ==="
+          echo "=== Files in repository ==="
           ls -lah
 
-          echo "=== APP ==="
-          ls -lah app
+          echo "=== ZIP files ==="
+          find . -maxdepth 2 -type f -iname "*.zip" -print
+
+          ZIP_FILE=$(find . -maxdepth 2 -type f -iname "*.zip" | head -n 1)
+
+          if [ -z "$ZIP_FILE" ]; then
+            echo "ERROR: ZIP file not found"
+            exit 1
+          fi
+
+          echo "Using ZIP: $ZIP_FILE"
+
+          rm -rf app
+          mkdir app
+          unzip -q "$ZIP_FILE" -d app
+
+          echo "=== APP CONTENT ==="
+          find app -maxdepth 3 -type f | head -100
 
           echo "=== package.json ==="
-          find app -name package.json -maxdepth 3 -print
+          find app -name package.json -print
 
           echo "=== HTML ==="
-          find app -name "*.html" -maxdepth 4 -print
+          find app -name "*.html" -print
 
           echo "=== CONFIG ==="
-          find app -maxdepth 2 -type f \
+          find app -maxdepth 3 -type f \
             \( -name "vite.config.*" -o -name "next.config.*" -o -name "astro.config.*" -o -name "tsconfig.json" \) \
             -print
