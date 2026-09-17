@@ -50,6 +50,35 @@ jobs:
           echo "=== Build script after patch ==="
           cat build-android.sh
 
+      - name: Fix JVM target
+        working-directory: app/TeleChat-CloudBuild/TeleChat-Android
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+
+          for p in Path("android").rglob("*.gradle.kts"):
+              s = p.read_text()
+
+              if "compileOptions {" in s:
+                  s = s.replace(
+                      "compileOptions {",
+                      """compileOptions {
+                  sourceCompatibility = JavaVersion.VERSION_21
+                  targetCompatibility = JavaVersion.VERSION_21"""
+                  )
+
+              p.write_text(s)
+              print("Patched:", p)
+          PY
+
+      - name: Show Android configuration
+        working-directory: app/TeleChat-CloudBuild/TeleChat-Android
+        run: |
+          echo "=== Android Gradle files ==="
+          find android -name "*.gradle.kts" -type f -print
+          echo "=== app/build.gradle.kts ==="
+          cat android/app/build.gradle.kts
+
       - name: Build Android
         working-directory: app/TeleChat-CloudBuild/TeleChat-Android
         run: |
