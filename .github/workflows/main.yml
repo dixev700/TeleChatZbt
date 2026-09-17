@@ -1,19 +1,35 @@
-name: Test TeleChat
+name: Analyze TeleChat
 
 on:
   workflow_dispatch:
 
 jobs:
-  test:
+  analyze:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Show files
+      - name: Extract TeleChat
         run: |
-          echo "=== Files in repository ==="
+          rm -rf app
+          mkdir app
+          unzip -q grok-workspace.zip -d app
+
+          echo "=== ROOT ==="
           ls -lah
-          echo "=== ZIP files ==="
-          find . -maxdepth 2 -type f -name "*.zip" -print
+
+          echo "=== APP ==="
+          ls -lah app
+
+          echo "=== package.json ==="
+          find app -name package.json -maxdepth 3 -print
+
+          echo "=== HTML ==="
+          find app -name "*.html" -maxdepth 4 -print
+
+          echo "=== CONFIG ==="
+          find app -maxdepth 2 -type f \
+            \( -name "vite.config.*" -o -name "next.config.*" -o -name "astro.config.*" -o -name "tsconfig.json" \) \
+            -print
